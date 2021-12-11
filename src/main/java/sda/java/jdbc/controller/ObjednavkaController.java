@@ -1,13 +1,22 @@
-package sda.java.jdbc;
+package sda.java.jdbc.controller;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.beryx.textio.TextIO;
 import org.beryx.textio.TextTerminal;
 
+import sda.java.jdbc.service.ObjednavkaService;
+
 public class ObjednavkaController {
-  public void executeMenu(ObjednavkaService objednavkaService, TextIO textIO, Connection con) {
+  private final TextIO textIO;
+  private final ObjednavkaService objednavkaService;
+
+  public ObjednavkaController(TextIO textIO, ObjednavkaService objednavkaService) {
+    this.textIO = textIO;
+    this.objednavkaService = objednavkaService;
+  }
+
+  public void executeMenu() {
     TextTerminal<?> textTerminal = textIO.getTextTerminal();
     loop:
     while (true) {
@@ -16,14 +25,14 @@ public class ObjednavkaController {
             .read("Uprava objednavek:");
         switch (option) {
           case VYPIS_VSECH:
-            objednavkaService.listAllOrders(con, textTerminal);
+            objednavkaService.listAllOrders(textTerminal);
             break;
           case VYPIS_DETAILU:
-            objednavkaService.listAllOrders(con, textTerminal);
+            objednavkaService.listAllOrders(textTerminal);
             Long index = textIO.newLongInputReader()
                 .withMinVal(1l)
                 .read("Zadejte id objednavky pro zobrazeni:");
-            objednavkaService.listOrder(con, textTerminal, index);
+            objednavkaService.listOrder(textTerminal, index);
             break;
           case ZPET:
           default:

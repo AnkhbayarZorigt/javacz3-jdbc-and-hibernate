@@ -1,4 +1,4 @@
-package sda.java.jdbc;
+package sda.java.jdbc.controller;
 
 public enum ProductMenuOptions {
   VYPIS_VSECH_PRODUKTU,

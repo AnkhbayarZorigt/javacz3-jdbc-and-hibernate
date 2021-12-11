@@ -1,39 +1,39 @@
 package sda.java.jdbc;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
 import org.beryx.textio.TextIO;
 import org.beryx.textio.TextIoFactory;
 import org.beryx.textio.TextTerminal;
+
+import sda.java.jdbc.controller.MainMenuOptions;
+import sda.java.jdbc.controller.ObjednavkaController;
+import sda.java.jdbc.controller.ProductController;
+import sda.java.jdbc.service.HibernateService;
+import sda.java.jdbc.service.ObjednavkaService;
+import sda.java.jdbc.service.ProductService;
 
 public class TrainingExample {
 
   public static void main(String args[]) {
     try {
-      Connection con = DriverManager.getConnection(
-          "jdbc:mysql://localhost:3306/javacz3", "root", "hUfKTHTjC2X99s4GTFEgUeVy");
       TextIO textIO = TextIoFactory.getTextIO();
       TextTerminal<?> textTerminal = textIO.getTextTerminal();
 
-      ProductService productService = new ProductService();
-      ProductController productController = new ProductController();
-      ObjednavkaController objednavkaController = new ObjednavkaController();
-      ObjednavkaService objednavkaService = new ObjednavkaService();
+      HibernateService hibernateService = new HibernateService();
+      ProductService productService = new ProductService(hibernateService);
+      ProductController productController = new ProductController(textIO, productService);
+      ObjednavkaService objednavkaService = new ObjednavkaService(hibernateService);
+      ObjednavkaController objednavkaController = new ObjednavkaController(textIO, objednavkaService);
+
 
       loop: while (true) {
         MainMenuOptions option = textIO.newEnumInputReader(MainMenuOptions.class)
             .read("Prace s databazi objednavek:");
         switch (option) {
           case PRODUKT:
-            productController.executeMenu(productService, textIO, con);
+            productController.executeMenu();
             break;
           case OBJEDNAVKA:
-            objednavkaController.executeMenu(objednavkaService, textIO, con);
+            objednavkaController.executeMenu();
             break;
           case KONEC:
           default:
@@ -41,7 +41,6 @@ public class TrainingExample {
         }
       }
 
-      con.close();
     } catch (Exception e) {
       System.out.println(e);
     }

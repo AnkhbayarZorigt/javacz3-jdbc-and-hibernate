@@ -1,14 +1,24 @@
-package sda.java.jdbc;
+package sda.java.jdbc.controller;
 
-import java.sql.Connection;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 
 import org.beryx.textio.TextIO;
 import org.beryx.textio.TextTerminal;
 
+import sda.java.jdbc.service.ProductService;
+
 public class ProductController {
 
-  public void executeMenu(ProductService product, TextIO textIO, Connection con) {
+  private final TextIO textIO;
+  private final ProductService productService;
+
+  public ProductController(TextIO textIO, ProductService productService) {
+    this.textIO = textIO;
+    this.productService = productService;
+  }
+
+  public void executeMenu() {
     TextTerminal<?> textTerminal = textIO.getTextTerminal();
     loop:
     while (true) {
@@ -17,7 +27,7 @@ public class ProductController {
             .read("Uprava informaci o produktech:");
         switch (option) {
           case VYPIS_VSECH_PRODUKTU:
-            product.listProduct(con, textTerminal);
+            productService.listProduct(textTerminal);
             break;
           case PRIDANI_PRODUKTU: {
             String name = textIO.newStringInputReader()
@@ -27,11 +37,11 @@ public class ProductController {
             Double price = textIO.newDoubleInputReader()
                 .withMinVal(0.0)
                 .read("Cena produktu:");
-            product.addProduct(con, name, price);
+            productService.addProduct(name, BigDecimal.valueOf(price));
             break;
           }
           case ZMENA_PRODUKTU: {
-            product.listProduct(con, textTerminal);
+            productService.listProduct(textTerminal);
             Long index = textIO.newLongInputReader()
                 .withMinVal(1l)
                 .read("Cislo radku ke zmene:");
@@ -47,15 +57,15 @@ public class ProductController {
             if (name != null && name.trim().isEmpty()) {
               name = null;
             }
-            product.updateProduct(con, index, name, price);
+            productService.updateProduct(index, name, BigDecimal.valueOf(price));
             break;
           }
           case SMAZANI_PRODUKTU: {
-            product.listProduct(con, textTerminal);
+            productService.listProduct(textTerminal);
             Long index = textIO.newLongInputReader()
                 .withMinVal(1l)
                 .read("Cislo radku ke smazani:");
-            product.deleteProduct(con, index);
+            productService.deleteProduct(index);
             break;
           }
           case ZPET:
